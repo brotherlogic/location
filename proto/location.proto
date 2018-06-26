@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package location;
+
+message Config {
+  repeated Location locations = 1;
+}
+
+message Location {
+  string name = 1;
+  float lat = 2;
+  float lon = 3;
+  int64 time = 4;
+}
+
+message AddLocationRequest {
+  Location location = 1;
+}
+
+message AddLocationResponse {}
+
+message GetLocationRequest {
+  string name = 1;
+}
+
+message GetLocationResponse {
+  Location location = 1;
+}
+
+service LocationService {
+  rpc AddLocation(AddLocationRequest) returns (AddLocationResponse) {};
+  rpc GetLocation(GetLocationRequest) returns (GetLocationResponse) {};
+}
