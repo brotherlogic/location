@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	// KEY - where the wants are stored
+	// KEY - where the locations are stored
 	KEY = "/github.com/brotherlogic/location/config"
 )
 
