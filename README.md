@@ -1,2 +1,2 @@
-# recordwants
-[![Coverage Status](https://coveralls.io/repos/github/brotherlogic/recordwants/badge.svg)](https://coveralls.io/github/brotherlogic/recordwants)
+# location
+[![Coverage Status](https://coveralls.io/repos/github/brotherlogic/location/badge.svg)](https://coveralls.io/github/brotherlogic/location)
