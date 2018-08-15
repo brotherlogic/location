@@ -7,6 +7,7 @@ import (
 
 	"github.com/brotherlogic/goserver"
 	"github.com/brotherlogic/keystore/client"
+	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
@@ -33,13 +34,13 @@ func Init() *Server {
 	return s
 }
 
-func (s *Server) save() {
-	s.KSclient.Save(KEY, s.config)
+func (s *Server) save(ctx context.Context) {
+	s.KSclient.Save(ctx, KEY, s.config)
 }
 
-func (s *Server) load() error {
+func (s *Server) load(ctx context.Context) error {
 	config := &pb.Config{}
-	data, _, err := s.KSclient.Read(KEY, config)
+	data, _, err := s.KSclient.Read(ctx, KEY, config)
 
 	if err != nil {
 		return err
@@ -60,9 +61,9 @@ func (s *Server) ReportHealth() bool {
 }
 
 // Mote promotes/demotes this server
-func (s *Server) Mote(master bool) error {
+func (s *Server) Mote(ctx context.Context, master bool) error {
 	if master {
-		err := s.load()
+		err := s.load(ctx)
 		return err
 	}
 

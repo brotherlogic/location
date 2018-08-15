@@ -12,7 +12,7 @@ import (
 func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*pb.AddLocationResponse, error) {
 	req.GetLocation().Time = time.Now().Unix()
 	s.config.Locations = append(s.config.Locations, req.GetLocation())
-	s.save()
+	s.save(ctx)
 
 	return &pb.AddLocationResponse{}, nil
 }
