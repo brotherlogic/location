@@ -30,10 +30,10 @@ func TestBasicRun(t *testing.T) {
 	}
 
 	if loc.Location.Time == 0 {
-		t.Errorf("location has no time: %v")
+		t.Errorf("location has no time: %v", loc.Location.Time)
 	}
 
 	if loc.Location.Name != "dave" {
-		t.Errorf("location has not name: %v")
+		t.Errorf("location has not name: %v", loc.Location.Name)
 	}
 }

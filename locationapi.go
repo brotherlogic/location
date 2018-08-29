@@ -14,6 +14,8 @@ func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*
 	s.config.Locations = append(s.config.Locations, req.GetLocation())
 	s.save(ctx)
 
+	s.writer.writeToLed(ctx, "Simon has moved", "")
+
 	return &pb.AddLocationResponse{}, nil
 }
 

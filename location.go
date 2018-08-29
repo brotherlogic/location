@@ -4,13 +4,16 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"strconv"
 
 	"github.com/brotherlogic/goserver"
+	"github.com/brotherlogic/goserver/utils"
 	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	pbled "github.com/brotherlogic/led/proto"
 	pb "github.com/brotherlogic/location/proto"
 )
 
@@ -23,6 +26,7 @@ const (
 type Server struct {
 	*goserver.GoServer
 	config *pb.Config
+	writer writer
 }
 
 // Init builds the server
@@ -30,8 +34,26 @@ func Init() *Server {
 	s := &Server{
 		&goserver.GoServer{},
 		&pb.Config{},
+		&prodWriter{},
 	}
 	return s
+}
+
+type writer interface {
+	writeToLed(ctx context.Context, top, bot string)
+}
+
+type prodWriter struct{}
+
+func (p *prodWriter) writeToLed(ctx context.Context, top, bot string) {
+	ip, port, err := utils.Resolve("led")
+	if err == nil {
+		conn, err := grpc.Dial(ip+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
+		if err == nil {
+			client := pbled.NewLedServiceClient(conn)
+			client.Display(ctx, &pbled.DisplayRequest{TopLine: top, BottomLine: bot})
+		}
+	}
 }
 
 func (s *Server) save(ctx context.Context) {
