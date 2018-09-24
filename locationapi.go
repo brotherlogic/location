@@ -10,6 +10,8 @@ import (
 
 // AddLocation adds the user location
 func (s *Server) AddLocation(ctx context.Context, req *pb.AddLocationRequest) (*pb.AddLocationResponse, error) {
+	s.counts++
+
 	req.GetLocation().Time = time.Now().Unix()
 	s.config.Locations = append(s.config.Locations, req.GetLocation())
 	s.save(ctx)

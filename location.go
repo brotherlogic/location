@@ -27,6 +27,7 @@ type Server struct {
 	*goserver.GoServer
 	config *pb.Config
 	writer writer
+	counts int64
 }
 
 // Init builds the server
@@ -35,6 +36,7 @@ func Init() *Server {
 		&goserver.GoServer{},
 		&pb.Config{},
 		&prodWriter{},
+		0,
 	}
 	return s
 }
@@ -94,7 +96,9 @@ func (s *Server) Mote(ctx context.Context, master bool) error {
 
 // GetState gets the state of the server
 func (s *Server) GetState() []*pbg.State {
-	return []*pbg.State{}
+	return []*pbg.State{
+		&pbg.State{Key: "counts", Value: s.counts},
+	}
 }
 
 func main() {
