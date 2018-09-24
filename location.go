@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"strconv"
@@ -38,6 +39,7 @@ func Init() *Server {
 		&prodWriter{},
 		0,
 	}
+	s.writer = &prodWriter{Log: s.Log}
 	return s
 }
 
@@ -45,7 +47,9 @@ type writer interface {
 	writeToLed(ctx context.Context, top, bot string)
 }
 
-type prodWriter struct{}
+type prodWriter struct {
+	Log func(text string)
+}
 
 func (p *prodWriter) writeToLed(ctx context.Context, top, bot string) {
 	ip, port, err := utils.Resolve("led")
@@ -53,7 +57,8 @@ func (p *prodWriter) writeToLed(ctx context.Context, top, bot string) {
 		conn, err := grpc.Dial(ip+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
 		if err == nil {
 			client := pbled.NewLedServiceClient(conn)
-			client.Display(ctx, &pbled.DisplayRequest{TopLine: top, BottomLine: bot})
+			r, err := client.Display(ctx, &pbled.DisplayRequest{TopLine: top, BottomLine: bot})
+			p.Log(fmt.Sprintf("Written %v and %v", r, err))
 		}
 	}
 }
