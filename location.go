@@ -120,7 +120,9 @@ func main() {
 	server.PrepServer()
 	server.Register = server
 
-	server.RegisterServer("location", false)
-	server.Log("Starting!")
+	err := server.RegisterServer("location", false)
+	if err != nil {
+		log.Fatalf("Unable to register: %v", err)
+	}
 	server.Serve()
 }
