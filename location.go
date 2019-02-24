@@ -5,10 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strconv"
 
 	"github.com/brotherlogic/goserver"
-	"github.com/brotherlogic/goserver/utils"
 	"github.com/brotherlogic/keystore/client"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -48,18 +46,17 @@ type writer interface {
 }
 
 type prodWriter struct {
-	Log func(text string)
+	Log  func(text string)
+	dial func(server string) (*grpc.ClientConn, error)
 }
 
 func (p *prodWriter) writeToLed(ctx context.Context, top, bot string) {
-	ip, port, err := utils.Resolve("led")
+	conn, err := p.dial("led")
 	if err == nil {
-		conn, err := grpc.Dial(ip+":"+strconv.Itoa(int(port)), grpc.WithInsecure())
-		if err == nil {
-			client := pbled.NewLedServiceClient(conn)
-			r, err := client.Display(ctx, &pbled.DisplayRequest{TopLine: top, BottomLine: bot})
-			p.Log(fmt.Sprintf("Written %v and %v", r, err))
-		}
+		defer conn.Close()
+		client := pbled.NewLedServiceClient(conn)
+		r, err := client.Display(ctx, &pbled.DisplayRequest{TopLine: top, BottomLine: bot})
+		p.Log(fmt.Sprintf("Written %v and %v", r, err))
 	}
 }
 
@@ -87,6 +84,11 @@ func (s *Server) DoRegister(server *grpc.Server) {
 // ReportHealth alerts if we're not healthy
 func (s *Server) ReportHealth() bool {
 	return true
+}
+
+// Shutdown the server
+func (s *Server) Shutdown(ctx context.Context) error {
+	return nil
 }
 
 // Mote promotes/demotes this server

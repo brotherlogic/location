@@ -13,7 +13,15 @@ func InitTestServer() *Server {
 	s := Init()
 	s.SkipLog = true
 	s.GoServer.KSclient = *keystoreclient.GetTestClient(".test")
+	s.writer = &testWriter{}
 	return s
+}
+
+type testWriter struct {
+}
+
+func (t *testWriter) writeToLed(ctx context.Context, top, bot string) {
+	// Do nothing
 }
 
 func TestBasicRun(t *testing.T) {
