@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 
 	pbg "github.com/brotherlogic/goserver/proto"
+	"github.com/brotherlogic/goserver/utils"
 	pbled "github.com/brotherlogic/led/proto"
 	pb "github.com/brotherlogic/location/proto"
 )
@@ -110,6 +111,7 @@ func (s *Server) GetState() []*pbg.State {
 
 func main() {
 	var quiet = flag.Bool("quiet", false, "Show all output")
+	var init = flag.Bool("init", false, "Init the system")
 	flag.Parse()
 
 	//Turn off logging
@@ -118,7 +120,7 @@ func main() {
 		log.SetOutput(ioutil.Discard)
 	}
 	server := Init()
-	server.GoServer.KSclient = *keystoreclient.GetClient(server.GetIP)
+	server.GoServer.KSclient = *keystoreclient.GetClient(server.DialMaster)
 	server.PrepServer()
 	server.Register = server
 
@@ -126,5 +128,14 @@ func main() {
 	if err != nil {
 		log.Fatalf("Unable to register: %v", err)
 	}
+
+	if *init {
+		ctx, cancel := utils.BuildContext("monitor", "monitor")
+		defer cancel()
+		server.config.Locations = append(server.config.Locations, &pb.Location{Name: "Test"})
+		server.save(ctx)
+		return
+	}
+
 	server.Serve()
 }
